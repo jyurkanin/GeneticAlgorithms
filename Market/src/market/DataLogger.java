@@ -1,5 +1,6 @@
 package market;
-
+//so usually this program runs in a separate machine altogether but right now it doesn't.
+//TODO make this whole program run as a thread in the main program.
 import java.util.List;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -364,7 +365,7 @@ class Port implements Runnable{
                 System.out.println("There was no query.\nCLosing socket.");
                 sock.close();
                 return;
-            }  //so in[0] == ticker. in[1] == todate. number of values before date == 30.
+            }  //so in[0] == ticker. in[1] == todate. number of values before date == 100.
             
             String ticker = "";
             for(String name : DataLogger.tickers){
@@ -374,7 +375,7 @@ class Port implements Runnable{
                 }
             }
             //System.out.println("Ticker Requested " + ticker);   //This works. 30 MIght Change!!!
-            String response[] = new String[30];  //so that it returns the specified number of data points.
+            String response[] = new String[100];  //so that it returns the specified number of data points.
             String dat;
             System.out.println("Going to Send: ");
             BufferedReader file = new BufferedReader(new FileReader(dir+ticker));
@@ -421,13 +422,13 @@ class Port implements Runnable{
     }
     public void print(String text){
         output.println(text);
-        output.flush(); //what is this wizardry
+        output.flush();
     }
     public void print(String text[]){
         for(String line : text){
             output.println(line);
         }
-        output.flush(); //still don't know what this does exactly
+        output.flush();
     }
     public void close(){
         try{
