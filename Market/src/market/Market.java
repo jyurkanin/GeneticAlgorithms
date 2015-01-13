@@ -1,21 +1,17 @@
 package market;
 
 import org.uncommons.watchmaker.framework.GenerationalEvolutionEngine;
-import org.uncommons.watchmaker.framework.CandidateFactory;
+import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
 import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
 import org.uncommons.watchmaker.framework.SelectionStrategy;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.InputStreamReader;
-import java.net.Socket;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.uncommons.watchmaker.framework.selection.RouletteWheelSelection;
+import com.tictactec.ta.lib.CoreAnnotated;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Random;
+import java.util.stream.DoubleStream;
 
 
 public class Market {
@@ -23,33 +19,54 @@ public class Market {
 	static CandidateFactory<Animal> candidateFactory;
 	static List<EvolutionaryOperator<Animal>> operators = new LinkedList<EvolutionaryOperator<Animal>>();
 	static FitnessEvaluator<Animal> fitnessEvaluator;
-	static SelectionStrategy<Animal> selectionStrategy;
-	static DataInterface port;
+	static SelectionStrategy<Object> selectionStrategy;
+	static DataBase data;
+	static CoreAnnotated c;
 	public static void main(String[] args) {
-		port = new DataInterface();
+		data = new DataBase();
+		c = new CoreAnnotated();
+		c.o
 		candidateFactory = new Factory();
 		operators = new LinkedList<EvolutionaryOperator<Animal>>();
 		operators.add(new AnimalCrossover());
 		operators.add(new AnimalMutation());
+		selectionStrategy = new RouletteWheelSelection();
 		EvolutionaryOperator<Animal> pipeline = new EvolutionPipeline<Animal>(operators);
 		
 		engine = new GenerationalEvolutionEngine<Animal>(candidateFactory, pipeline, fitnessEvaluator, selectionStrategy, rng);;
 
 	}
 	
+	public static List<IndicatorValues> generate(IStockData data){
+		return null;
+	}
+	
 
 }
 
 class Animal{ //these are the things that are going to be evolved into an efficient stock trading animal.
-	public Animal(){
-		
+	double[] thresholds = new double[4];
+	public Animal(double a, double b, double c, double d){
+		thresholds[0] = a;
+		thresholds[1] = b;
+		thresholds[2] = c;
+		thresholds[3] = d;
+	}
+	public double getProfit(){ //TODO this.
+		return 0.0;
 	}
 }
 
-class Factory implements CandidateFactory<Animal>{ //this is going to create new animals for testing.
+class Factory extends AbstractCandidateFactory<Animal>{ //this is going to create new animals for testing.
 	public Factory(){
 		
 	}
+@Override
+    public Animal generateRandomCandidate(Random r) {
+	    DoubleStream dubbs = r.doubles(4);
+	    double[] rands = dubbs.toArray();
+	    return new Animal(rands[0], rands[1], rands[2], rands[3]);
+    }	
 }
 
 class AnimalCrossover implements EvolutionaryOperator<Animal>{ //these are the operators which evolve the animals.
@@ -68,46 +85,12 @@ class AnimalEvaluator implements FitnessEvaluator<Animal>{
 	public AnimalEvaluator(){
 		
 	}
-}
-
-class DataInterface{
-    PrintWriter output;
-    BufferedReader input;
-    Socket sock;
-    final boolean DEBUG = false;
-    public DataInterface(){
-        sock = new Socket();
-        try{
-            sock = new Socket("127.0.0.1", 1025);
-            input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            output = new PrintWriter(sock.getOutputStream(), true);
-        }
-        catch(IOException e){}
-    }
-    public String[] query(String ticker){ //way this works is
-    	try{                              //it querys server and
-    		               //server always responds with the last 100 
-    		               //data points in the form in the form
-    		               //Date,Open,High,Low,Close,Volume,Adj Close
-    		               //last one is not important... Dont even know what adj close is.
-    		output.println("ticker,"+getStringDate());
-    		String[] response = new String[100];
-    		int index = 0;
-    		while(input.ready() && (index <= 100)){
-    			response[index] = input.readLine();
-    			index++;
-    		}
-    		return response;
-    	}
-    	catch(IOException e){
-            return null;
-    	}
-    	
-    }
-    public static String getStringDate(){
-        DateFormat df = new SimpleDateFormat("yy-MM-dd");
-        Date d = new Date();
-        String dt = df.format(d);
-        return dt;
-    }  //returns yy/mm/dd
+	@Override
+	public double getFitness(Animal animal, List<? extends Animal> arg1) {
+		return animal.getProfit(); //makes sense I think.
+	}
+	@Override
+	public boolean isNatural() {
+		return true;
+	}
 }
