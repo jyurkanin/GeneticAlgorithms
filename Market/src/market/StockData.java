@@ -7,14 +7,14 @@ class StockData {
 	double[] Opens;
 	double[] Closes;
 	int Len;
-	public StockData(String[] list){
+	public StockData(String[] list){ //this function also works.
 		Len = list.length; //also the length of everything else.
 		int index = 0;
-		double[] Closes = new double[Len];
-		double[] Highs = new double[Len];
-		double[] Lows = new double[Len];
-		double[] Opens = new double[Len];
-		double[] Volumes = new double[Len];
+		Closes = new double[Len];
+		Highs = new double[Len];
+		Lows = new double[Len];
+		Opens = new double[Len];
+		Volumes = new double[Len];
 		
 		String[] buf;
 		for(String line : list){
@@ -27,7 +27,7 @@ class StockData {
 			index++;
 		}
 	}
-	public double[] getHighs() {	return Highs;} //I like it inline.
+	public double[] getHighs() { 	return Highs;} //I like it inline.
 	public double[] getLows() {		return Lows;}
 	public double[] getVolumes() {	return Volumes;}
 	public double[] getOpens() {	return Opens;}

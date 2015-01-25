@@ -19,22 +19,22 @@ class DataBase{
 		try{
 			List<String> response = new ArrayList<String>();
 			api = new URL("chartapi.finance.yahoo.com/instrument/1.0/" + ticker + "/chartdata;type=quote;range=15d/csv");
-			 input = new BufferedReader(new InputStreamReader(api.openStream()));
-			 do{
-				 if(input.readLine().split(":")[0].equals("volume")) break; //this parses to the start of the data.
-			 }while(input.ready());
-			 
-			 while(input.ready()){
-				 response.add(input.readLine());
-			 }
-			 return response.toArray(new String[1]); //function is smart enough to realize input is wrong size and it makes a bigger one.
+			input = new BufferedReader(new InputStreamReader(api.openStream()));
+			do{
+				if(input.readLine().split(":")[0].equals("volume")) break; //this parses to the start of the data.
+			}while(input.ready());
+			
+			while(input.ready()){
+				response.add(input.readLine());
+			}
+			return response.toArray(new String[1]); //function is smart enough to realize input is wrong size and it makes a bigger one.
 			 
 		}
 		catch(MalformedURLException e){}
 		catch(IOException e){}
 		return null;
 	}
-	static String[] getTestData(){
+	static String[] getTestData(){ //this works just fine.
 		try{
 			List<String> response = new ArrayList<>();
 			BufferedReader input = new BufferedReader(new FileReader("/home/Justin/data/TEST"));

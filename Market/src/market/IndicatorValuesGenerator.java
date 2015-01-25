@@ -3,6 +3,7 @@ package market;
 import com.tictactec.ta.lib.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -20,12 +21,15 @@ public class IndicatorValuesGenerator {
 		int outLen = inLen - lookback;
 		double[] outReal = new double[outLen];
 		c.ultOsc(0, inLen - 1, d.getHighs(), d.getLows(), d.getCloses(), 7, 14, 28, outBegIdx, outNBElement, outReal);
+		//System.out.println(Arrays.toString(outReal));
 		double[] ultOscs = new double[inLen];
 		for(int x = 0; x < inLen; x++){
 			ultOscs[x] = -1;  //just for the initialization
 		}
 		System.arraycopy(outReal, 0, ultOscs, outBegIdx.value, outReal.length);
-		signals.add(new Signal(ultOscs));
+		//System.out.println(Arrays.toString(ultOscs)); not important for debugging currently
+		//System.out.println(outBegIdx.value);
+		signals.add(new Signal(ultOscs, outBegIdx.value));
 		signals.add(new Signal(d.getHighs()));
 		signals.add(new Signal(d.getCloses()));
 		signals.add(new Signal(d.getLows()));
@@ -38,11 +42,17 @@ public class IndicatorValuesGenerator {
 class Signal{  //sort of like a stream.
 	double[] Data;
 	int Index;
+	final int START;
 	public Signal(double[] buf){
 		Data = buf;
-		Index = 0;
+		START = Index = 0;
+	}
+	public Signal(double[] buf, int begIdx){
+		Data = buf;
+		START = Index = begIdx;
 	}
 	public double next(){
+		if(!ready()) return -1;
 		double buf = Data[Index];
 		Index++;
 		return buf;
@@ -52,5 +62,8 @@ class Signal{  //sort of like a stream.
 	}
 	public boolean ready(){
 		return Index < Data.length;
+	}
+	public void reset(){
+		Index = START;
 	}
 }
