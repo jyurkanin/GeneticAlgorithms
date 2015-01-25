@@ -316,7 +316,7 @@ class AnimalCrossover implements EvolutionaryOperator<Animal>{ //these are the o
 }
 
 class AnimalMutation implements EvolutionaryOperator<Animal>{ //idea. Instead of mutating, it will just get a whole new random animal. Yeah.
-	final double CHANCE_OF_MUTATION = .90; //my idea idea is high elitism and high mutation.
+	final double CHANCE_OF_MUTATION = .50; //my idea idea is high elitism and high mutation.
 	final boolean DEBUG = false; //everything is good, no need to debug
 	int n;
 	public AnimalMutation(){
@@ -337,7 +337,33 @@ class AnimalMutation implements EvolutionaryOperator<Animal>{ //idea. Instead of
 		//if(DEBUG) System.out.println("Population after mutation " + generation.size());
 		return generation;
 	}
-	public Animal mutate(Random rand, Animal animal){
+	public Animal mutate(Random rand, Animal animal){ //this returns a new animal instead mutating an old one.
+		DoubleStream dubbs = rand.doubles(25); //4 for sell range buy range and the rest is the amount to buy.
+	    double[] rands = dubbs.toArray();
+	    if(rands[24] >= CHANCE_OF_MUTATION) return animal; //if we are not mutating then return same animal
+	    for(int x = 0; x < 4; x++){
+	    	rands[x] *= 100; //because signal is 1-100 not 0-1.
+	    }
+	    double temp[] = new double[2];
+	    temp[0] = rands[2];
+	    temp[1] = rands[3];
+	    Arrays.sort(temp);  //[0]is biggest [1] is smallest
+	    double scale = temp[0] - temp[1];  //multipoly it by the dubbs
+	    double temp2[] = new double[20];
+	    for(int x = 4; x < 24; x++){
+	    	temp2[x-4] = (temp[1] + (rands[x] * scale));	
+	    }
+	    Arrays.sort(temp2);
+	    for(int x = 0; x < temp2.length; x++){
+	    	rands[x+4] = temp2[x];
+	    }
+	    double[] ret = new double[24];
+	    for(int x = 0; x < ret.length; x++){
+	    	ret[x] = rands[x]; //lets just copy this array into one that is size 24 just in case rands is actually really big.
+	    }
+	    return new Animal(ret);
+	}
+	public Animal mutateSingle(Random rand, Animal animal){
 		DoubleStream r = rand.doubles(24); //4 for sell range buy range and the rest is the amount to buy.
 	    double[] dubbs = r.toArray();
 	    
